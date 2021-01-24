@@ -1,10 +1,10 @@
-export function generateDev(path: string, content = '', throttle = 1000) {
+export function generateDev(path: string, content = '', isJSON = false, throttle = 1000) {
   return `
 import { ref } from 'vue'
 import { ignorableWatch, useThrottleFn } from '@vueuse/core'
 
 const PATH = ${JSON.stringify(path)}
-const content = ref(${JSON.stringify(content)})
+const content = ref(${isJSON ? content : JSON.stringify(content)})
 
 let controller = null
 
@@ -29,7 +29,7 @@ async function send() {
   catch (e) {}
 }
 
-const { ignoreUpdates } = ignorableWatch(content, useThrottleFn(send, ${throttle}))
+const { ignoreUpdates } = ignorableWatch(content, useThrottleFn(send, ${throttle}), { deep: true })
 
 if (import.meta.hot) {
   import.meta.hot.on('vite-fs-update', (data) => {
@@ -45,7 +45,7 @@ export default content
 `
 }
 
-export function generateBuild(content = '') {
+export function generateBuild(content = '', isJSON = true) {
   return `import { ref } from 'vue'
-export default ref(${JSON.stringify(content)})`
+export default ref(${isJSON ? content : JSON.stringify(content)})`
 }

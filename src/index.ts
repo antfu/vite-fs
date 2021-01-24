@@ -1,10 +1,10 @@
-import { resolve } from 'path'
+import { resolve, dirname } from 'path'
 import { promises as fs } from 'fs'
 import type { Plugin, ResolvedConfig, ViteDevServer } from 'vite'
 import _debug from 'debug'
 import LRU from 'lru-cache'
 import bodyParser from 'body-parser'
-import { PACKAGE_NAME_PREFIX, SUFFIX } from './constants'
+import { PREFIX, SUFFIX } from './constants'
 import { generateBuild, generateDev } from './gen'
 
 const debug = _debug('vite-fs:resolve')
@@ -45,28 +45,32 @@ export function ViteFS(): Plugin {
           const { path, content } = req.body
           debug('upload:', path)
           skipped.add(path)
-          fs.writeFile(path, content, 'utf-8')
+          const isJSON = path.endsWith('.json')
+          fs.writeFile(path, isJSON ? JSON.stringify(content, null, 2) : content, 'utf-8')
           res.statusCode = 200
           res.end()
         },
       )
     },
-    resolveId(id) {
-      if (id.startsWith(PACKAGE_NAME_PREFIX)) {
-        if (!id.endsWith(SUFFIX))
-          return id + SUFFIX
-        else
-          return id
-      }
+    resolveId(id, importer) {
+      if (id.startsWith(PREFIX) || !id.endsWith(SUFFIX) || !importer)
+        return null
+      return PREFIX + resolve(dirname(importer), id)
     },
     async load(id) {
-      if (!id.startsWith(PACKAGE_NAME_PREFIX) || !id.endsWith(SUFFIX))
+      if (!id.startsWith(PREFIX) || !id.endsWith(SUFFIX))
         return null
 
-      const path = resolve(config.root, id.slice(PACKAGE_NAME_PREFIX.length, -SUFFIX.length))
+      const path = id.slice(PREFIX.length, -SUFFIX.length)
+      const isJSON = path.endsWith('.json')
+      debug(path)
 
-      if (config.command === 'build')
-        return generateBuild(await readFile(path))
+      if (config.command === 'build') {
+        return {
+          code: generateBuild(await readFile(path), isJSON),
+          map: '',
+        }
+      }
 
       if (server && !watched.includes(path)) {
         watched.push(path)
@@ -81,18 +85,24 @@ export function ViteFS(): Plugin {
 
           debug(`changed: ${path}`)
           fileCache.del(path)
+          const content = await readFile(path)
           server!.ws.send({
             type: 'custom',
             event: 'vite-fs-update',
             data: {
               path,
-              content: await readFile(path),
+              content: isJSON
+                ? JSON.parse(content!)
+                : content,
             },
           })
         })
       }
 
-      return generateDev(path, await readFile(path))
+      return {
+        code: generateDev(path, await readFile(path), isJSON),
+        map: '',
+      }
     },
   }
 }

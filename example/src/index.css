@@ -4,7 +4,7 @@
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
-  background: yellow;
+  background: skyblue;
   height: 100%;
 }
 
@@ -12,4 +12,20 @@ body, html {
   height: 100%;
   padding: 0;
   margin: 0;
+}
+
+h3 {
+  margin: 0;
+  padding-top: 1em;
+}
+
+textarea {
+  background: transparent;
+  border: 1px solid black;
+  padding: 10px;
+  margin: 10px;
+  width: 400px;
+  height: 300px;
+  outline: none;
+  display: inline-block;
 }

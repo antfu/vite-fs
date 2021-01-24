@@ -5,6 +5,7 @@
     "lib": ["ESNext", "DOM"],
     "esModuleInterop": true,
     "strict": true,
+    "importHelpers": true,
     "strictNullChecks": true,
     "moduleResolution": "Node",
     "resolveJsonModule": true
@@ -13,5 +14,10 @@
     "**/dist",
     "**/node_modules",
     "**/test"
+  ],
+  "include": [
+    "**/*.vue",
+    "**/*.d.ts",
+    "**/*.ts"
   ]
 }
