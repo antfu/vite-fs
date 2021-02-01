@@ -4,6 +4,23 @@
 
 [![NPM version](https://img.shields.io/npm/v/vite-fs?color=a1b858)](https://www.npmjs.com/package/vite-fs)
 
+## Usage
+
+Suffix `.ref` to path you'd like to import, for example
+
+```ts
+import data from '../data.json.ref'
+// the type of `data` will be `Ref<any>`
+// `data` will bind to `data.json` magically on dev
+
+data.value.x = 10
+// `data.json` will be updated
+```
+
+Changes of the file will reflect to the `ref` as well.
+
+When importing `.json` files, it will do the parse/stringify automatically. When importing with other file formats, a plain `Ref<string>` with UTF-8 encoding will be returned.
+
 ## Install
 
 ```bash
@@ -38,19 +55,6 @@ declare module '*.ref' {
 }
 ```
 
-## Usage
-
-Suffix `.ref` to path you'd like to import, for example
-
-```ts
-import data from '../data.json.ref'
-// the type of `data` will be `Ref<any>`
-// `data` will bind to `data.json` magically on dev
-
-data.value.x = 10
-// `data.json` will be updated
-```
-
 ## Sponsors
 
 This project is part of my <a href='https://github.com/antfu-sponsors'>Sponsor Program</a>
@@ -63,4 +67,4 @@ This project is part of my <a href='https://github.com/antfu-sponsors'>Sponsor P
 
 ## License
 
-MIT License © 2020 [Anthony Fu](https://github.com/antfu)
+MIT License © 2021 [Anthony Fu](https://github.com/antfu)
