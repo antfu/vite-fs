@@ -1,6 +1,6 @@
 # Vite FS
 
-{WIP} Reactive FileSystem for Vite accessable in the client side
+{WIP} Reactive FileSystem for Vite accessible in client-side.
 
 [![NPM version](https://img.shields.io/npm/v/vite-fs?color=a1b858)](https://www.npmjs.com/package/vite-fs)
 
